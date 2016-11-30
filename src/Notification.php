@@ -66,7 +66,7 @@ class Notification extends IlluminateNotification
             });
     }
 
-    public function toMattermost(): MatermostMessage
+    public function toMattermost(): MattermostMessage
     {
         return (new MattermostMessage)
             ->text('A job failed at '.config('app.url'))
