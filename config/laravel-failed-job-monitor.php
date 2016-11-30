@@ -24,7 +24,7 @@ return [
     /*
      * The channels to which the notification will be sent.
      */
-    'channels' => ['mail', 'slack'],
+    'channels' => ['mail', 'slack', 'mattermost'],
 
     'mail' => [
         'to' => 'email@example.com',
@@ -32,5 +32,9 @@ return [
 
     'slack' => [
         'webhook_url' => env('FAILED_JOB_SLACK_WEBHOOK_URL'),
+    ],
+
+    'mattermost' => [
+        'webhook_url' => env('FAILED_JOB_MATTERMOST_WEBHOOK_URL'),
     ],
 ];

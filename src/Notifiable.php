@@ -18,6 +18,11 @@ class Notifiable
         return config('laravel-failed-job-monitor.slack.webhook_url');
     }
 
+    public function routeNotificationForMattermost(): string
+    {
+        return config('laravel-failed-job-monitor.mattermost.webhook_url');
+    }
+
     /**
      * @return mixed
      */

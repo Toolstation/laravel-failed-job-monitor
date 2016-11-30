@@ -7,6 +7,8 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Messages\SlackMessage;
 use Illuminate\Notifications\Messages\SlackAttachment;
 use Illuminate\Notifications\Notification as IlluminateNotification;
+use ThibaudDauce\Mattermost\MattermostChannel;
+use ThibaudDauce\Mattermost\Message as MattermostMessage;
 
 class Notification extends IlluminateNotification
 {
@@ -15,7 +17,15 @@ class Notification extends IlluminateNotification
 
     public function via($notifiable): array
     {
-        return config('laravel-failed-job-monitor.channels');
+        $channels = config('laravel-failed-job-monitor.channels');
+
+        foreach ($channels as $key => $value) {
+            if ($value == 'mattermost') {
+                $channels[$key] = MattermostChannel::class;
+            }
+        }
+
+        return $channels;
     }
 
     public function setEvent(JobFailed $event): self
@@ -53,6 +63,19 @@ class Notification extends IlluminateNotification
                     'Job body' => $this->event->job->getRawBody(),
                     'Exception' => $this->event->exception->getTraceAsString(),
                 ]);
+            });
+    }
+
+    public function toMattermost(): MatermostMessage
+    {
+        return (new MattermostMessage)
+            ->text('A job failed at '.config('app.url'))
+            ->attachment(function ($attachment) {
+                $attachment->error()
+                           ->field('Exception message', $this->event->exception->getMessage())
+                           ->field('Job class', $this->event->job->resolveName())
+                           ->field('Job body', $this->event->job->getRawBody())
+                           ->field('Exception', $this->event->exception->getTraceAsString());
             });
     }
 }
